@@ -7,21 +7,25 @@ const channels = [
     streamer: "pomber",
     url: "https://vscode.dev/liveshare/AF5DF568C175EB8573211A329A9C343B5173",
     title: "Building CodeTV",
+    topic: "Web Development",
   },
   {
     streamer: "lorem",
     url: "https://vscode.dev/liveshare/AF5DF568C175EB8573211A329A9C343B5173",
     title: "Lorem ipsum",
+    topic: "Game Development",
   },
   {
     streamer: "ipsum",
     url: "https://vscode.dev/liveshare/AF5DF568C175EB8573211A329A9C343B5173",
     title: "Lorem ipsum",
+    topic: "Rust",
   },
   {
     streamer: "dolor",
     url: "https://vscode.dev/liveshare/AF5DF568C175EB8573211A329A9C343B5173",
     title: "Lorem ipsum",
+    topic: "Web Development",
   },
 ];
 
@@ -29,6 +33,7 @@ export default function Home() {
   const router = useRouter();
   const { params = ["pomber"] } = router.query;
   const streamer = params[0];
+  const channel = channels.find((c) => c.streamer === streamer);
   return (
     <div className="flex h-screen">
       <div className="flex-1 flex flex-col overflow-hidden">
@@ -50,17 +55,20 @@ export default function Home() {
 
         <div className="flex h-full">
           <Sidebar />
-          <main className="flex flex-col w-full bg-white overflow-x-hidden overflow-y-auto">
-            <div className="flex w-full mx-auto ">
-              <div
-                className="flex flex-col w-full h-full text-gray-900 text-xl border-gray-900 "
-                style={{ minHeight: "70vh" }}
-              >
-                <iframe
-                  src="https://vscode.dev/liveshare/AF5DF568C175EB8573211A329A9C343B5173"
-                  className="h-full w-full"
-                />
-                <h2>{streamer}</h2>
+          <main className="flex flex-col w-full overflow-x-hidden overflow-y-auto">
+            <iframe
+              src="https://vscode.dev/liveshare/AF5DF568C175EB8573211A329A9C343B5173"
+              className="w-full flex-1"
+            />
+            <div className="p-4 flex gap-4 items-center">
+              <img
+                className="rounded-full bg-gray-400 w-16 h-16"
+                src={`https://github.com/${streamer}.png`}
+              />
+              <div>
+                <h2 className="font-semibold text-lg">{streamer}</h2>
+                <p className="font-semibold">{channel.title}</p>
+                <p className="text-sm">{channel.topic}</p>
               </div>
             </div>
           </main>
@@ -72,14 +80,20 @@ export default function Home() {
 
 function Sidebar() {
   return (
-    <nav className="flex w-72 h-full bg-gray-100">
+    <nav className="w-72 h-full bg-gray-100 hidden md:flex">
       <div className="pt-1 w-full h-full mx-auto flex flex-col text-gray-900 text-xl">
         {channels.map((channel) => (
           <div className="text-gray-900 text-xl w-full" key={channel.streamer}>
             <Link href={`/${channel.streamer}`}>
-              <a className="py-1 px-2 hover:bg-gray-200 flex gap-2">
-                <div className="rounded-full bg-gray-400 w-8 h-8"></div>
-                <div>{channel.streamer}</div>
+              <a className="py-1 px-2 hover:bg-gray-200 flex gap-2 items-center">
+                <img
+                  className="rounded-full bg-gray-400 w-8 h-8"
+                  src={`https://github.com/${channel.streamer}.png`}
+                />
+                <div className="flex flex-col">
+                  <p className="font-semibold text-base">{channel.streamer}</p>
+                  <p className="text-sm text-gray-500">{channel.topic}</p>
+                </div>
               </a>
             </Link>
           </div>
