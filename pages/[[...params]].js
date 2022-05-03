@@ -5,30 +5,25 @@ import useSWR from "swr";
 import { fetchStreams } from "./api/streams";
 
 export async function getServerSideProps() {
-  const { data, error } = await fetchStreams();
+  const streams = await fetchStreams();
   return {
     props: {
-      initialStreams: data,
+      initialStreams: streams,
     },
   };
 }
-const fetcher = (...args) =>
-  fetch(...args)
-    .then((res) => res.json())
-    .then(({ data }) => data);
+const fetcher = (...args) => fetch(...args).then((res) => res.json());
 
 export default function Page({ initialStreams }) {
   const router = useRouter();
   const { params = ["pomber"] } = router.query;
   const streamer = params[0];
 
-  const { data } = useSWR("/api/streams", fetcher, {
+  const { data: streams } = useSWR("/api/streams", fetcher, {
     fallbackData: initialStreams,
     refreshInterval: 1000,
   });
 
-  if (!data) return <div>loading...</div>;
-  const streams = data;
   const stream = streams.find((c) => c.streamer === streamer);
   return (
     <div className="flex h-screen">
@@ -50,7 +45,7 @@ export default function Page({ initialStreams }) {
         </header>
 
         <div className="flex h-full">
-          <Sidebar streams={streams} />
+          <Sidebar streams={streams} current={streamer} />
           <main className="flex flex-col w-full overflow-x-hidden overflow-y-auto">
             <iframe
               src="https://vscode.dev/liveshare/AF5DF568C175EB8573211A329A9C343B5173"
@@ -74,7 +69,7 @@ export default function Page({ initialStreams }) {
   );
 }
 
-function Sidebar({ streams }) {
+function Sidebar({ streams, current }) {
   return (
     <nav className="w-72 h-full bg-gray-100 hidden md:flex">
       <div className="pt-1 w-full h-full mx-auto flex flex-col text-gray-900 text-xl">
@@ -82,28 +77,46 @@ function Sidebar({ streams }) {
           Streams
         </div>
         {streams.map((stream) => (
-          <div className="text-gray-900 text-xl w-full" key={stream.streamer}>
-            <Link href={`/${stream.streamer}`}>
-              <a className="py-1 px-2 hover:bg-gray-200 flex gap-2 items-center">
-                <img
-                  className="rounded-full bg-gray-400 w-8 h-8"
-                  src={`https://github.com/${stream.streamer}.png`}
-                />
-                <div className="flex flex-col mr-auto">
-                  <p className="font-semibold text-base">{stream.streamer}</p>
-                  <p className="text-sm text-gray-500">{stream.topic}</p>
-                </div>
-                <div className="flex items-center self-start pt-1">
-                  <div className="rounded-full bg-red-600 w-2 h-2" />
-                  <div className="w-8 text-xs pl-1 text-gray-600 tabular-nums">
-                    {stream.viewers}
-                  </div>
-                </div>
-              </a>
-            </Link>
-          </div>
+          <SidebarItem
+            key={stream.streamer}
+            stream={stream}
+            isCurrent={current === stream.streamer}
+          />
         ))}
       </div>
     </nav>
+  );
+}
+
+function SidebarItem({ stream, isCurrent }) {
+  return (
+    <div
+      className={`text-gray-900 hover:bg-gray-200 text-xl w-full pr-2 ${
+        isCurrent
+          ? "border-l-[0.25rem] bg-gray-200 pl-1 border-gray-800"
+          : "pl-2"
+      }`}
+      key={stream.streamer}
+      title={stream.title}
+    >
+      <Link href={`/${stream.streamer}`}>
+        <a className="py-1  flex gap-2 items-center">
+          <img
+            className="rounded-full w-8 h-8"
+            src={`https://github.com/${stream.streamer}.png`}
+          />
+          <div className="flex flex-col mr-auto">
+            <p className="font-semibold text-base">{stream.streamer}</p>
+            <p className={`text-sm text-gray-500`}>{stream.topic}</p>
+          </div>
+          <div className="flex items-center self-start pt-1">
+            <div className="rounded-full bg-red-600 w-2 h-2" />
+            <div className={`w-8 text-xs pl-1 text-gray-600 tabular-nums`}>
+              {stream.viewers}
+            </div>
+          </div>
+        </a>
+      </Link>
+    </div>
   );
 }

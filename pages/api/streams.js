@@ -6,11 +6,11 @@ const supabase = createClient(
 );
 
 export default async function handler(req, res) {
-  const { data, error } = await fetchStreams();
-  res.status(200).json({ data, error });
+  const data = await fetchStreams();
+  res.status(200).json(data);
 }
 
 export async function fetchStreams() {
   const { data, error } = await supabase.from("live").select();
-  return { data, error };
+  return data;
 }
