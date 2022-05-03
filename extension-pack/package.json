@@ -1,0 +1,19 @@
+{
+  "name": "codetv-extension-pack",
+  "displayName": "CodeTV Extension Pack",
+  "publisher": "pomber",
+  "description": "",
+  "version": "0.0.1",
+  "engines": {
+    "vscode": "^1.66.0"
+  },
+  "categories": [
+    "Extension Packs"
+  ],
+  "extensionPack": [
+    "ms-vsliveshare.vsliveshare",
+    "pomber.codetv"
+  ],
+  "repository": "pomber/codetv",
+  "license": "MIT"
+}

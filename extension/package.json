@@ -1,6 +1,7 @@
 {
   "name": "codetv",
   "displayName": "CodeTV",
+  "publisher": "pomber",
   "description": "",
   "version": "0.0.1",
   "engines": {
@@ -44,5 +45,7 @@
   "dependencies": {
     "axios": "^0.27.2",
     "vsls": "^1.0.4753"
-  }
+  },
+  "repository": "pomber/codetv",
+  "license": "MIT"
 }
