@@ -16,15 +16,16 @@ const fetcher = (...args) => fetch(...args).then((res) => res.json());
 
 export default function Page({ initialStreams }) {
   const router = useRouter();
-  const { params = ["pomber"] } = router.query;
-  const streamer = params[0];
 
   const { data: streams } = useSWR("/api/streams", fetcher, {
     fallbackData: initialStreams,
-    refreshInterval: 1000,
+    refreshInterval: 2000,
   });
 
-  const stream = streams.find((c) => c.streamer === streamer);
+  const { params = [] } = router.query;
+
+  const stream = streams.find((c) => c.streamer === params[0]) || streams[0];
+  const { streamer } = stream;
   return (
     <div className="flex h-screen">
       <div className="flex-1 flex flex-col overflow-hidden">
@@ -48,7 +49,7 @@ export default function Page({ initialStreams }) {
           <Sidebar streams={streams} current={streamer} />
           <main className="flex flex-col w-full overflow-x-hidden overflow-y-auto">
             <iframe
-              src="https://vscode.dev/liveshare/AF5DF568C175EB8573211A329A9C343B5173"
+              src={`https://vscode.dev/liveshare/${stream.session_id}`}
               className="w-full flex-1"
             />
             <div className="p-4 flex gap-4 items-center">

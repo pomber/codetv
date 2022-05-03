@@ -11,6 +11,9 @@ export default async function handler(req, res) {
 }
 
 export async function fetchStreams() {
-  const { data, error } = await supabase.from("live").select();
+  const { data, error } = await supabase
+    .from("live")
+    .select()
+    .order("created_at", { ascending: false });
   return data;
 }

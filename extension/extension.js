@@ -1,5 +1,9 @@
+const { default: axios } = require("axios");
 const vscode = require("vscode");
 const vsls = require("vsls");
+
+// const ENDPOINT = "http://localhost:3000/api/";
+const ENDPOINT = "https://codetv.vercel.app/api/";
 
 /**
  * @param {vscode.ExtensionContext} context
@@ -35,22 +39,6 @@ function activate(context) {
 
       const sessionId = liveshare.session.id;
 
-      liveshare.onDidChangePeers(async () => {
-        let viewers = liveshare.peers.length;
-
-        vscode.window.showInformationMessage(
-          `${viewers} viewer${viewers === 1 ? "" : "s"} watching`
-        );
-      });
-
-      liveshare.onDidChangeSession(async (sessionChange) => {
-        if (!liveshare.session.id) {
-          vscode.window.showInformationMessage(
-            `stream ends ${JSON.stringify(liveshare.session)}`
-          );
-        }
-      });
-
       const authSession = await vscode.authentication.getSession("github", [], {
         createIfNone: true,
       });
@@ -61,14 +49,35 @@ function activate(context) {
       const stream = {
         title,
         topic,
-        sessionId,
+        session_id: sessionId,
         streamer,
       };
 
+      await axios.post(ENDPOINT + "start", JSON.stringify(stream), {
+        headers: { "Content-Type": "application/json" },
+      });
+
       // Display a message box to the user
-      vscode.window.showInformationMessage(
-        "https://vscode.dev/liveshare/" + sessionId
-      );
+      // vscode.window.showInformationMessage(
+      //   "https://vscode.dev/liveshare/" + sessionId
+      // );
+
+      liveshare.onDidChangePeers(async () => {
+        let viewers = liveshare.peers.length;
+        await axios.post(
+          ENDPOINT + "viewers",
+          JSON.stringify({ streamer, viewers }),
+          { headers: { "Content-Type": "application/json" } }
+        );
+      });
+
+      liveshare.onDidChangeSession(async (sessionChange) => {
+        if (!liveshare.session.id) {
+          await axios.post(ENDPOINT + "end", JSON.stringify({ streamer }), {
+            headers: { "Content-Type": "application/json" },
+          });
+        }
+      });
     })
   );
 

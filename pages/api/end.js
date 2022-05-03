@@ -10,13 +10,14 @@ export default async function handler(req, res) {
     res.status(405).send({ message: "Only POST requests allowed" });
   }
 
-  const { title, topic, session_id, streamer } = req.body;
+  const { streamer } = req.body;
 
   console.log(req.body);
 
   const { data, error } = await supabase
     .from("live")
-    .upsert({ title, topic, session_id, streamer, viewers: 0 });
+    .delete()
+    .match({ streamer });
 
   console.log({ data, error });
 
